@@ -1,0 +1,39 @@
+<template>
+<style>
+  #root { width: 1920px; height: 1080px; background: #0e1116; color: #e8ecf1;
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+    position: relative; overflow: hidden; }
+  #s6-head { position: absolute; top: 70px; width: 100%; text-align: center;
+    font-size: 40px; font-weight: 700;
+    font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; }
+  #s6-term { position: absolute; left: 260px; top: 200px; width: 1400px; height: 700px;
+    background: #0c0f14; border: 1px solid #2a3340; border-radius: 16px;
+    padding: 40px 48px; font-size: 30px; line-height: 1.9; }
+  #s6-term .cmd { color: #e8ecf1; }
+  #s6-term .dim { color: #9aa4b2; }
+  #s6-term .blue { color: #7cc4ff; }
+  #s6-term .green { color: #8fe3a8; }
+  #s6-term .ok { color: #8fe3a8; font-weight: 700; }
+</style>
+<script src="assets/gsap.min.js"></script>
+<div id="root" data-composition-id="s6" data-width="1920" data-height="1080">
+  <div id="s6-head" class="clip" data-start="0.3" data-duration="11.7" data-track-index="1">Any AI tool can use it.</div>
+  <div id="s6-term" class="clip" data-start="0.6" data-duration="11.4" data-track-index="1">
+    <div id="s6-l1" class="cmd">$ epigen recall --query "$180 jacket" --k 3</div>
+    <div id="s6-l2"><span class="blue">mem_shopping_040</span> <span class="dim">· shopping · 0.5295</span><br><span class="dim">tried on a $180 wool jacket…</span></div>
+    <div id="s6-l3"><span class="blue">mem_shopping_035</span> <span class="dim">· shopping · 0.4341</span><br><span class="dim">down vest $185, zipper broke…</span></div>
+    <div id="s6-l4"><span class="green">mem_family_025</span> <span class="dim">· family · 0.3939</span><br><span class="dim">$8,600 saved, $6,400 to go…</span></div>
+    <div id="s6-l5" class="ok">3 memories · shopping + family · same store, same retrieval</div>
+  </div>
+</div>
+<script>
+  const tl = gsap.timeline({ paused: true });
+  tl.fromTo("#s6-head", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 0.3);
+  tl.fromTo("#s6-term", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.5 }, 0.6);
+  ["#s6-l1", "#s6-l2", "#s6-l3", "#s6-l4"].forEach((sel, i) => {
+    tl.fromTo(sel, { opacity: 0 }, { opacity: 1, duration: 0.3 }, 1 + i * 1.1);
+  });
+  tl.fromTo("#s6-l5", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 5.8);
+  window.__timelines["s6"] = tl;
+</script>
+</template>

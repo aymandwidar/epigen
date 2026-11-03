@@ -1,0 +1,106 @@
+<template>
+<style>
+  #root { width: 1920px; height: 1080px; background: #0e1116; color: #e8ecf1;
+    font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+    position: relative; overflow: hidden; }
+  #s3-head { position: absolute; top: 60px; width: 100%; text-align: center;
+    font-size: 44px; font-weight: 700; }
+  #s3-head span { color: #7cc4ff; }
+  .rowlabel { position: absolute; left: 220px; font-size: 30px; color: #9aa4b2; }
+  .dot { position: absolute; width: 22px; height: 22px; border-radius: 50%;
+    background: #2a3340; }
+  .dot.shop { background: #274b63; }
+  .dot.fam { background: #2a4a38; }
+  .dot.lit-shop { background: #7cc4ff; }
+  .dot.lit-fam { background: #8fe3a8; }
+  #s3-count { position: absolute; top: 780px; width: 100%; text-align: center;
+    font-size: 40px; font-weight: 700; color: #8fe3a8; }
+  #s3-caption { position: absolute; left: 210px; right: 210px; bottom: 70px; text-align: center;
+    font-size: 34px; background: rgba(0,0,0,0.6); border-radius: 12px; padding: 16px 24px; }
+</style>
+<script src="assets/gsap.min.js"></script>
+<div id="root" data-composition-id="s3" data-width="1920" data-height="1080">
+  <div id="s3-head" class="clip" data-start="0.3" data-duration="11.7" data-track-index="1">65 memories <span>·</span> 2 angles</div>
+  <div id="s3-rows" class="clip" data-start="0.8" data-duration="11.2" data-track-index="1">
+    <div class="rowlabel" style="top:250px">shopping (40)</div>
+    <div class="dot shop" style="left:560px;top:320px"></div>
+<div class="dot shop" style="left:589px;top:320px"></div>
+<div class="dot shop" style="left:618px;top:320px"></div>
+<div class="dot shop" style="left:647px;top:320px"></div>
+<div class="dot shop" style="left:676px;top:320px"></div>
+<div class="dot shop" style="left:705px;top:320px"></div>
+<div class="dot shop" style="left:734px;top:320px"></div>
+<div class="dot shop" style="left:763px;top:320px"></div>
+<div class="dot shop" style="left:792px;top:320px"></div>
+<div class="dot shop" style="left:821px;top:320px"></div>
+<div class="dot shop s3-lit-shop" style="left:850px;top:320px"></div>
+<div class="dot shop" style="left:879px;top:320px"></div>
+<div class="dot shop" style="left:908px;top:320px"></div>
+<div class="dot shop" style="left:937px;top:320px"></div>
+<div class="dot shop" style="left:966px;top:320px"></div>
+<div class="dot shop" style="left:995px;top:320px"></div>
+<div class="dot shop" style="left:1024px;top:320px"></div>
+<div class="dot shop" style="left:1053px;top:320px"></div>
+<div class="dot shop" style="left:1082px;top:320px"></div>
+<div class="dot shop" style="left:1111px;top:320px"></div>
+<div class="dot shop" style="left:1140px;top:320px"></div>
+<div class="dot shop" style="left:1169px;top:320px"></div>
+<div class="dot shop" style="left:1198px;top:320px"></div>
+<div class="dot shop" style="left:1227px;top:320px"></div>
+<div class="dot shop" style="left:1256px;top:320px"></div>
+<div class="dot shop" style="left:1285px;top:320px"></div>
+<div class="dot shop" style="left:1314px;top:320px"></div>
+<div class="dot shop" style="left:1343px;top:320px"></div>
+<div class="dot shop s3-lit-shop" style="left:1372px;top:320px"></div>
+<div class="dot shop" style="left:1401px;top:320px"></div>
+<div class="dot shop" style="left:1430px;top:320px"></div>
+<div class="dot shop" style="left:1459px;top:320px"></div>
+<div class="dot shop s3-lit-shop" style="left:1488px;top:320px"></div>
+<div class="dot shop" style="left:1517px;top:320px"></div>
+<div class="dot shop s3-lit-shop" style="left:1546px;top:320px"></div>
+<div class="dot shop" style="left:1575px;top:320px"></div>
+<div class="dot shop" style="left:1604px;top:320px"></div>
+<div class="dot shop" style="left:1633px;top:320px"></div>
+<div class="dot shop" style="left:1662px;top:320px"></div>
+<div class="dot shop s3-lit-shop" style="left:1691px;top:320px"></div>
+    <div class="rowlabel" style="top:470px">family (25)</div>
+    <div class="dot fam" style="left:560px;top:540px"></div>
+<div class="dot fam" style="left:605px;top:540px"></div>
+<div class="dot fam" style="left:650px;top:540px"></div>
+<div class="dot fam" style="left:695px;top:540px"></div>
+<div class="dot fam" style="left:740px;top:540px"></div>
+<div class="dot fam" style="left:785px;top:540px"></div>
+<div class="dot fam" style="left:830px;top:540px"></div>
+<div class="dot fam" style="left:875px;top:540px"></div>
+<div class="dot fam" style="left:920px;top:540px"></div>
+<div class="dot fam" style="left:965px;top:540px"></div>
+<div class="dot fam" style="left:1010px;top:540px"></div>
+<div class="dot fam" style="left:1055px;top:540px"></div>
+<div class="dot fam" style="left:1100px;top:540px"></div>
+<div class="dot fam" style="left:1145px;top:540px"></div>
+<div class="dot fam" style="left:1190px;top:540px"></div>
+<div class="dot fam" style="left:1235px;top:540px"></div>
+<div class="dot fam" style="left:1280px;top:540px"></div>
+<div class="dot fam" style="left:1325px;top:540px"></div>
+<div class="dot fam" style="left:1370px;top:540px"></div>
+<div class="dot fam" style="left:1415px;top:540px"></div>
+<div class="dot fam" style="left:1460px;top:540px"></div>
+<div class="dot fam s3-lit-fam" style="left:1505px;top:540px"></div>
+<div class="dot fam s3-lit-fam" style="left:1550px;top:540px"></div>
+<div class="dot fam" style="left:1595px;top:540px"></div>
+<div class="dot fam s3-lit-fam" style="left:1640px;top:540px"></div>
+  </div>
+  <div id="s3-count" class="clip" data-start="4.5" data-duration="7.5" data-track-index="1">8 expressed</div>
+  <div id="s3-caption" class="clip" data-start="1" data-duration="10.5" data-track-index="2">Like epigenetics: every memory is stored, only the relevant ones are expressed.</div>
+</div>
+<script>
+  const tl = gsap.timeline({ paused: true });
+  tl.fromTo("#s3-head", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 0.3);
+  tl.fromTo("#s3-rows", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 0.8);
+  tl.fromTo("#s3-caption", { opacity: 0 }, { opacity: 1, duration: 0.6 }, 1);
+  tl.fromTo("#s3-count", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5 }, 4.5);
+  tl.to(".s3-lit-shop", { backgroundColor: "#7cc4ff", scale: 1.4, duration: 0.5, stagger: 0.06 }, 4);
+  tl.to(".s3-lit-fam", { backgroundColor: "#8fe3a8", scale: 1.4, duration: 0.5, stagger: 0.06 }, 4.3);
+  window.__timelines["s3"] = tl;
+</script>
+</template>

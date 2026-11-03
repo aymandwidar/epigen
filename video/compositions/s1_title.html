@@ -1,0 +1,24 @@
+<template>
+<style>
+  #root { width: 1920px; height: 1080px; background: #0e1116; color: #e8ecf1;
+    font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+    position: relative; overflow: hidden; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; }
+  #s1-title { font-size: 150px; font-weight: 800; letter-spacing: -0.03em; }
+  #s1-sub { font-size: 44px; color: #9aa4b2; margin-top: 18px; }
+  #s1-rule { width: 220px; height: 6px; background: #7cc4ff; border-radius: 3px; margin-top: 44px; }
+</style>
+<script src="assets/gsap.min.js"></script>
+<div id="root" data-composition-id="s1" data-width="1920" data-height="1080">
+  <div id="s1-title" class="clip" data-start="0.2" data-duration="5.8" data-track-index="1">Epigen</div>
+  <div id="s1-sub" class="clip" data-start="0.9" data-duration="5.1" data-track-index="1">a personal memory layer for AI</div>
+  <div id="s1-rule" class="clip" data-start="1.6" data-duration="4.4" data-track-index="1"></div>
+</div>
+<script>
+  const tl = gsap.timeline({ paused: true });
+  tl.fromTo("#s1-title", { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 0.9, ease: "power3.out" }, 0.2);
+  tl.fromTo("#s1-sub", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, 0.9);
+  tl.fromTo("#s1-rule", { opacity: 0, scaleX: 0 }, { opacity: 1, scaleX: 1, duration: 0.6, ease: "power3.out" }, 1.6);
+  window.__timelines["s1"] = tl;
+</script>
+</template>

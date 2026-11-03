@@ -8,4 +8,8 @@ __pycache__/
 *.pyc
 .models/
 .playwright-browsers/
+video/renders/
+video/assets/*.mov
+video/assets/*.mp4
 video/assets/*.webm
+.npm-cache/

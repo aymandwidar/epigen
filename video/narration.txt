@@ -1,0 +1,6 @@
+[00:00-00:06] Epigen — a personal memory layer for AI.
+[00:06-00:18] Every AI gives everyone the same answer, because none of them know you.
+[00:18-00:30] Like epigenetics: every memory is stored, only the relevant ones are expressed.
+[00:30-00:47] Same question. Epigen answers from my own history, across shopping and family.
+[00:47-00:59] Any tool can call Epigen over MCP: same store, same retrieval.
+[00:59-01:09] The model stays general. The memory gets personal.

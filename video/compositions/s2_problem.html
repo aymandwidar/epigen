@@ -1,0 +1,34 @@
+<template>
+<style>
+  #root { width: 1920px; height: 1080px; background: #0e1116; color: #e8ecf1;
+    font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+    position: relative; overflow: hidden; }
+  #s2-head { position: absolute; top: 44px; width: 100%; text-align: center;
+    font-size: 38px; font-weight: 700; color: #9aa4b2; }
+  .bubble { position: absolute; left: 510px; width: 900px; background: #171c24;
+    border: 1px solid #2a3340; border-radius: 14px; padding: 16px 28px; }
+  .bubble .q { font-size: 27px; font-weight: 700; }
+  .bubble .a { font-size: 25px; color: #9aa4b2; margin-top: 4px; }
+  #s2-caption { position: absolute; left: 210px; right: 210px; bottom: 70px; text-align: center;
+    font-size: 34px; background: rgba(0,0,0,0.6); border-radius: 12px; padding: 16px 24px; }
+</style>
+<script src="assets/gsap.min.js"></script>
+<div id="root" data-composition-id="s2" data-width="1920" data-height="1080">
+  <div id="s2-head" class="clip" data-start="0.3" data-duration="11.7" data-track-index="1">Five apps. One answer.</div>
+  <div id="s2-b1" class="clip" data-start="1" data-duration="11" data-track-index="1"><div class="bubble" style="top:130px"><div class="q">Should I buy this?</div><div class="a">Check the fit, compare prices, and sleep on it.</div></div></div>
+  <div id="s2-b2" class="clip" data-start="1.8" data-duration="10.2" data-track-index="1"><div class="bubble" style="top:272px"><div class="q">Should I buy this?</div><div class="a">Check the fit, compare prices, and sleep on it.</div></div></div>
+  <div id="s2-b3" class="clip" data-start="2.6" data-duration="9.4" data-track-index="1"><div class="bubble" style="top:414px"><div class="q">Should I buy this?</div><div class="a">Check the fit, compare prices, and sleep on it.</div></div></div>
+  <div id="s2-b4" class="clip" data-start="3.4" data-duration="8.6" data-track-index="1"><div class="bubble" style="top:556px"><div class="q">Should I buy this?</div><div class="a">Check the fit, compare prices, and sleep on it.</div></div></div>
+  <div id="s2-b5" class="clip" data-start="4.2" data-duration="7.8" data-track-index="1"><div class="bubble" style="top:698px"><div class="q">Should I buy this?</div><div class="a">Check the fit, compare prices, and sleep on it.</div></div></div>
+  <div id="s2-caption" class="clip" data-start="1" data-duration="10.5" data-track-index="2">Every AI gives everyone the same answer, because none of them know you.</div>
+</div>
+<script>
+  const tl = gsap.timeline({ paused: true });
+  tl.fromTo("#s2-head", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 0.3);
+  ["#s2-b1", "#s2-b2", "#s2-b3", "#s2-b4", "#s2-b5"].forEach((sel, i) => {
+    tl.fromTo(sel + " .bubble", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.45, ease: "power3.out" }, 1 + i * 0.8);
+  });
+  tl.fromTo("#s2-caption", { opacity: 0 }, { opacity: 1, duration: 0.6 }, 1);
+  window.__timelines["s2"] = tl;
+</script>
+</template>
