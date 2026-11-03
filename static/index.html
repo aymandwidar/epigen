@@ -183,7 +183,10 @@ function renderDecision(obj) {
   if (!obj || typeof obj.decision !== "string") { box.hidden = true; box.innerHTML = ""; return; }
   const reasons = (obj.reasons || []).slice(0, 3).map(r => {
     const chips = (r.memory_ids || []).map(chipHTML).join(" ");
-    return "<li>" + chippify(window.renderMarkdown(String(r.text || ""))) + "<br>" + chips + "</li>";
+    // The model also puts [mem_xxx] tags inside the reason text; strip them
+    // so each memory shows once, as a chip under the reason.
+    const text = String(r.text || "").replace(/\s*\[mem_[a-z]+_\d+\]/g, "");
+    return "<li>" + window.renderMarkdown(text) + " " + chips + "</li>";
   }).join("");
   box.innerHTML =
     '<p class="verdict">' + esc(obj.decision) + "</p>" +
@@ -270,14 +273,16 @@ async function ask() {
     const j = await r.json();
     $("plain").innerHTML = window.renderMarkdown(j.plain);
     $("plainWords").textContent = words(j.plain) + " words";
+    // renderCited fills citedById, which chips need; it must run first,
+    // otherwise every chip falls back to raw "[mem_xxx]" text.
+    const newId = pendingOutcome;
+    renderCited(j.cited, newId);
+    bindChips($("cited"));
     renderDecision(j.epigen_json);
     const answerText = j.epigen_text || j.epigen;
     $("epigen").innerHTML = chippify(window.renderMarkdown(answerText));
     $("epigenWords").textContent = words(answerText) + " words";
     bindChips($("epigen"));
-    const newId = pendingOutcome;
-    renderCited(j.cited, newId);
-    bindChips($("cited"));
     renderMap(j.map);
     $("photoDesc").textContent = j.photo_description ? "Photo: " + j.photo_description : "";
     if (newId && prevEpigenHTML) {

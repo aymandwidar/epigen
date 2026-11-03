@@ -22,6 +22,28 @@ stubs that still show the plain-vs-Epigen difference, clearly labeled.
 import base64
 import os
 
+
+def _load_dotenv(path: str = ".env") -> None:
+    """Load KEY=VALUE lines from .env without overriding real env vars.
+
+    The server never loaded .env itself, so it only ran LIVE when the
+    shell had already exported MODEL_API_KEY.
+    """
+    if not os.path.exists(path):
+        return
+    with open(path, encoding="utf-8") as fh:
+        for line in fh:
+            line = line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            key, value = line.split("=", 1)
+            key, value = key.strip(), value.strip().strip("'\"")
+            if key and key not in os.environ:
+                os.environ[key] = value
+
+
+_load_dotenv()
+
 BASE_URL = "https://api.meta.ai/v1"
 MODEL = os.environ.get("EPIGEN_MODEL", "muse-spark-1.3")
 def has_key() -> bool:
