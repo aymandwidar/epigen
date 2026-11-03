@@ -30,8 +30,9 @@ Open [http://localhost:8000](http://localhost:8000) in a browser.
 
 ## Limits & reliability
 
-- Both columns share the same limits: `max_tokens` 220 on the API call,
-  then a server-side trim to ~130 words at a sentence boundary.
+- Both columns share the same limit: a server-side trim to ~130 words
+  at a sentence boundary (no `max_tokens` — a small cap can be spent on
+  reasoning, returning empty content).
 - If any step of `/api/ask` fails, that column shows the error instead of
   going blank. The full traceback is logged server-side; the key is never
   logged.

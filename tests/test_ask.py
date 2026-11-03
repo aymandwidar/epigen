@@ -104,7 +104,7 @@ def test_ask_error_columns(monkeypatch):
     assert j["cited"] == [] and j["epigen_json"] is None
 
 
-def test_chat_sets_max_tokens(monkeypatch):
+def test_chat_omits_max_tokens(monkeypatch):
     import sys as _sys
     import types as _types
 
@@ -140,7 +140,7 @@ def test_chat_sets_max_tokens(monkeypatch):
     monkeypatch.setitem(_sys.modules, "openai", fake)
     monkeypatch.setenv("MODEL_API_KEY", "test-key-not-real")
     assert meta_api.chat([{"role": "user", "content": "hi"}]) == "hi"
-    assert calls["max_tokens"] == 220
+    assert "max_tokens" not in calls
     assert calls["model"] == "muse-spark-1.3"
 
 

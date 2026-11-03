@@ -259,7 +259,8 @@ $("photo").addEventListener("change", e => {
 });
 async function ask() {
   const btn = $("ask"); btn.disabled = true;
-  $("plain").textContent = "…"; $("epigen").textContent = "…";
+  $("plain").textContent = "Thinking…";
+  $("epigen").textContent = "Reading your memories…";
   const fd = new FormData();
   fd.append("question", $("question").value);
   const f = $("photo").files[0];

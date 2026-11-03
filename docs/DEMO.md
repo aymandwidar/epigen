@@ -27,7 +27,7 @@ Say: *"Every claim carries chips, not footnotes: the $180 jacket I walked
 away from, the $175 corduroy I returned, the $320 overcoat I regretted —
 a pattern of regretting clothing over $150 — AND a family angle: I'm saving
 for an apartment with my partner, so $180 competes with that goal. Both
-columns share the same budget — 220 tokens, trimmed to ~130 words — same
+columns share the same budget — trimmed to ~130 words — same
 budget, personal wins."*
 
 4. Scroll to the **Memory map**: 65 dots, loaded dim on page start, 8 lit.

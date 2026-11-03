@@ -1,5 +1,6 @@
 """Epigen FastAPI app: one page, two answers, memory citations."""
 
+import asyncio
 import json
 import logging
 import os
@@ -133,21 +134,27 @@ async def _run_ask(question: str, photo: UploadFile | None):
             photo_description = meta_api.stub_photo_description(filename)
 
     retrieved = retrieve(question, photo_description, memories)
+    prompt = build_epigen_prompt(question, photo_description, retrieved)
 
-    if meta_api.has_key():
+    async def _plain() -> str:
         try:
-            plain = meta_api.plain_answer(question, photo_description)
+            if meta_api.has_key():
+                return await asyncio.to_thread(
+                    meta_api.plain_answer, question, photo_description
+                )
+            return meta_api.stub_plain(question, photo_description)
         except Exception as exc:
-            plain = f"Plain Muse unavailable: {exc}"
+            return f"Plain Muse unavailable: {exc}"
+
+    async def _epigen() -> str:
         try:
-            epigen_text = meta_api.epigen_answer(
-                build_epigen_prompt(question, photo_description, retrieved)
-            )
+            if meta_api.has_key():
+                return await asyncio.to_thread(meta_api.epigen_answer, prompt)
+            return meta_api.stub_epigen(question, retrieved)
         except Exception as exc:
-            epigen_text = f"Epigen unavailable: {exc}"
-    else:
-        plain = meta_api.stub_plain(question, photo_description)
-        epigen_text = meta_api.stub_epigen(question, retrieved)
+            return f"Epigen unavailable: {exc}"
+
+    plain, epigen_text = await asyncio.gather(_plain(), _epigen())
 
     plain = trim_to_words(plain)
 
