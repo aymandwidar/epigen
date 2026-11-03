@@ -38,7 +38,9 @@ def _rect(px, x0, y0, x1, y1, color):
             px[y][3 * x:3 * x + 3] = bytes(color)
 
 
-def main(path: str = "demo/jacket.png") -> None:
+def main(path: str = "demo/jacket_drawn.png") -> None:
+    if os.path.basename(path) == "jacket.png":
+        raise ValueError("refusing to overwrite demo/jacket.png")
     bg = (24, 28, 36)
     jacket = (58, 68, 88)
     dark = (38, 46, 60)

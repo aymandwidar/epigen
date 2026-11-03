@@ -56,8 +56,8 @@ app/store.py         SQLite storage
 static/index.html    one-page UI (two columns, cited memories, outcome buttons)
 scripts/seed.py      Sam Rivera: 40 shopping + 25 family synthetic memories
 scripts/reset_demo.py  restore seeded state between takes
-scripts/make_demo_image.py  generates demo/jacket.png (stdlib only)
-demo/jacket.png      sample $180-jacket photo (generated, no external assets)
+scripts/make_demo_image.py  regenerates the old placeholder demo/jacket_drawn.png (stdlib only)
+demo/jacket.png      sample $180-jacket photo (demo/jacket.png is an AI-generated product image; no real product, brand, or person)
 docs/DEMO.md         3-minute recording script
 tests/               scoring + seed tests (15 tests)
 ```

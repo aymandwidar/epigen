@@ -25,7 +25,25 @@ def test_parse_epigen_json():
     assert parse_epigen_json("just text") is None
     assert parse_epigen_json('{"nope": 1}') is None
     obj = parse_epigen_json('```json\n{"answer": "hi"}\n```')
-    assert obj == {"answer": "hi"}
+    assert obj["answer"] == "hi"
+    assert obj["decision"] == "" and obj["reasons"] == []
+
+
+def test_parse_epigen_json_fenced_and_prose_prefixed():
+    body = ('{"decision": "Pass.", "reasons": [{"text": "r", '
+            '"memory_ids": ["mem_shopping_040", 7]}], "answer": "Pass [mem_shopping_040]."}')
+    fenced = parse_epigen_json("```json\n" + body + "\n```")
+    assert fenced["decision"] == "Pass."
+    assert fenced["reasons"] == [{"text": "r",
+                                 "memory_ids": ["mem_shopping_040"]}]
+    assert fenced["would_change_if"] == ""
+    wrapped = parse_epigen_json("Here is my verdict:\n" + body +
+                                "\nHope this helps!")
+    assert wrapped == fenced
+    sparse = parse_epigen_json('{"answer": "ok"}')
+    assert sparse == {"decision": "", "reasons": [],
+                      "would_change_if": "", "answer": "ok"}
+    assert parse_epigen_json("no braces at all") is None
 
 
 def _ask(client):

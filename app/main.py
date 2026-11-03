@@ -141,18 +141,51 @@ async def ask(
 
 
 def parse_epigen_json(text: str) -> dict | None:
-    """Parse the Epigen JSON reply; None when it is plain text (fallback)."""
+    """Parse the Epigen JSON reply; None when it is plain text (fallback).
+
+    Tolerates ```json fences and prose around the object: the first {...}
+    block is decoded, missing fields get safe defaults, and only a reply
+    with no usable "answer" falls back to plain text.
+    """
     t = text.strip()
     if t.startswith("```"):
         t = re.sub(r"^```(?:json)?\s*", "", t)
         t = re.sub(r"\s*```$", "", t)
+    obj = None
     try:
         obj = json.loads(t)
     except (json.JSONDecodeError, ValueError):
+        pass
+    if not isinstance(obj, dict):
+        start = t.find("{")
+        if start < 0:
+            return None
+        try:
+            obj, _ = json.JSONDecoder().raw_decode(t[start:])
+        except (json.JSONDecodeError, ValueError):
+            return None
+    if not isinstance(obj, dict):
         return None
-    if not isinstance(obj, dict) or "answer" not in obj:
+    answer = obj.get("answer")
+    if not isinstance(answer, str) or not answer.strip():
         return None
-    return obj
+    reasons = obj.get("reasons")
+    if not isinstance(reasons, list):
+        reasons = []
+    return {
+        "decision": str(obj.get("decision") or ""),
+        "reasons": [
+            {
+                "text": str(r.get("text") or ""),
+                "memory_ids": [m for m in r.get("memory_ids", [])
+                               if isinstance(m, str)],
+            }
+            for r in reasons
+            if isinstance(r, dict)
+        ],
+        "would_change_if": str(obj.get("would_change_if") or ""),
+        "answer": answer,
+    }
 
 
 @app.post("/api/outcome")
