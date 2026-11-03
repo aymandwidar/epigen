@@ -185,8 +185,10 @@ def build_memories() -> list[dict]:
 def main(db_path: str = DB_PATH) -> list[dict]:
     import json
 
+    from app.embeddings import backend_in_use
     from app.store import save_memory
 
+    print(f"Embeddings backend: {backend_in_use()}")
     mems = build_memories()
     conn = connect(db_path)
     conn.execute("DELETE FROM memories")

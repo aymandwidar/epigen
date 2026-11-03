@@ -25,6 +25,44 @@ Open [http://localhost:8000](http://localhost:8000) in a browser.
    cite ids for every personal claim, and to say when no memory supports one.
 4. **Log outcome** (kept / returned / regretted) saves a new memory, so the
    next answer changes.
+5. The memory map loads on page start (`GET /api/memories`, all dim);
+   after each Ask the retrieved top 8 light up.
+
+## Limits & reliability
+
+- Both columns share the same limits: `max_tokens` 220 on the API call,
+  then a server-side trim to ~130 words at a sentence boundary.
+- If any step of `/api/ask` fails, that column shows the error instead of
+  going blank. The full traceback is logged server-side; the key is never
+  logged.
+- Epigen must reply in JSON. Memory ids outside the retrieved top 8 are
+  dropped with a warning, and a reason left with none is marked
+  "(no memory cited)".
+
+## Embeddings
+
+Local only — the docs list no embedding endpoint. `EPIGEN_EMBEDDINGS`
+selects the backend (default `semantic`): fastembed `BAAI/bge-small-en-v1.5`
+cached in `.models/`, falling back to the deterministic hashed backend with
+a warning on any load failure. Backends have different dimensions, so
+re-seed after switching (`scripts/reset_demo.py`).
+
+## MCP server
+
+`app/mcp_server.py` exposes `recall` / `capture` / `log_outcome` over
+stdio on the same SQLite store — no new cloud services. Example client
+config (Claude Code `.mcp.json`, replace `<path-to-epigen>`):
+
+```json
+{"mcpServers": {"epigen": {"command": "<path-to-epigen>/.venv/bin/python",
+"args": ["app/mcp_server.py"], "cwd": "<path-to-epigen>"}}}
+```
+
+Quick check:
+
+```bash
+printf '%s\n' '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"recall","arguments":{"query":"$180 jacket","k":3}}}' | .venv/bin/python app/mcp_server.py
+```
 
 ## Meta Model API (read from dev.meta.ai docs, not guessed)
 
@@ -41,25 +79,29 @@ Open [http://localhost:8000](http://localhost:8000) in a browser.
   Note: Muse Image *generates/edits* images and SAM *segments* them
   ([image generation](https://dev.meta.ai/docs/image-generation)), so
   describing a photo goes through Muse Spark, not those two.
-- The docs list **no embedding endpoint**, so embeddings are a small local
-  hashed-token model (`app/embeddings.py`) with vectors in SQLite. No AWS,
-  no Bedrock, no other cloud services.
+- The docs list **no embedding endpoint**, so embeddings stay local
+  (`app/embeddings.py`): fastembed semantic by default, deterministic
+  hashed fallback, vectors in SQLite. No AWS, no Bedrock, no other
+  cloud services.
 
 ## Project layout
 
 ```
-app/main.py          FastAPI: /, /api/ask, /api/outcome, /api/health
+app/main.py          FastAPI: /, /api/ask, /api/outcome, /api/health, /api/memories
 app/retrieval.py     scoring, top-8 + token budget, prompt + citations
 app/meta_api.py      Meta Model API client (+ labeled DEMO MODE stubs)
-app/embeddings.py    local deterministic embeddings (no cloud endpoint exists)
+app/embeddings.py    local embeddings: fastembed semantic (default) or hashed fallback
+app/mcp_server.py    stdio MCP server: recall / capture / log_outcome
 app/store.py         SQLite storage
-static/index.html    one-page UI (two columns, cited memories, outcome buttons)
+static/index.html    one-page UI (decision card, chips, memory map, outcome buttons)
+static/md.js         vendored safe markdown renderer (no CDN)
 scripts/seed.py      Sam Rivera: 40 shopping + 25 family synthetic memories
 scripts/reset_demo.py  restore seeded state between takes
+scripts/smoke_live.py  manual live-API smoke test (owner runs it; never prints the key)
 scripts/make_demo_image.py  regenerates the old placeholder demo/jacket_drawn.png (stdlib only)
 demo/jacket.png      sample $180-jacket photo (demo/jacket.png is an AI-generated product image; no real product, brand, or person)
-docs/DEMO.md         3-minute recording script
-tests/               scoring + seed tests (15 tests)
+docs/DEMO.md         3-minute recording script (+ 15-second MCP beat)
+tests/               scoring, seed, ask, embeddings, MCP, markdown tests (mocked API)
 ```
 
 ## Data

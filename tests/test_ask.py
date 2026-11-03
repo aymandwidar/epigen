@@ -72,6 +72,78 @@ def test_validate_citations_drops_invented_ids(caplog):
     assert obj["reasons"][1]["text"] == "Made-up reason (no memory cited)"
 
 
+def test_trim_to_words():
+    from app.main import trim_to_words
+
+    short = " ".join(["word"] * 50)
+    assert trim_to_words(short) == short
+    sentences = [" ".join([f"s{i}w{j}" for j in range(10)]) + "."
+                 for i in range(20)]
+    long_text = " ".join(sentences)
+    assert len(long_text.split()) == 200
+    trimmed = trim_to_words(long_text)
+    assert len(trimmed.split()) <= 130
+    assert trimmed.endswith(".")
+    assert trimmed.startswith(sentences[0])
+    wall = " ".join(["word"] * 200)
+    hard = trim_to_words(wall)
+    assert len(hard.split()) == 130
+
+
+def test_ask_error_columns(monkeypatch):
+    import app.main as main_module
+
+    def boom():
+        raise RuntimeError("db gone")
+
+    monkeypatch.setattr(main_module, "connect", boom)
+    j = TestClient(app).post(
+        "/api/ask", data={"question": "hi?"}).json()
+    assert "db gone" in j["plain"]
+    assert "db gone" in j["epigen_text"]
+    assert j["cited"] == [] and j["epigen_json"] is None
+
+
+def test_chat_sets_max_tokens(monkeypatch):
+    import sys as _sys
+    import types as _types
+
+    import app.meta_api as meta_api
+
+    calls = {}
+
+    class FakeMessage:
+        content = "hi"
+
+    class FakeChoice:
+        message = FakeMessage()
+
+    class FakeResp:
+        choices = [FakeChoice()]
+
+    class FakeCompletions:
+        def create(self, **kwargs):
+            calls.update(kwargs)
+            return FakeResp()
+
+    class FakeChat:
+        completions = FakeCompletions()
+
+    class FakeClient:
+        def __init__(self, **kwargs):
+            calls["client"] = kwargs
+
+        chat = FakeChat()
+
+    fake = _types.ModuleType("openai")
+    fake.OpenAI = FakeClient
+    monkeypatch.setitem(_sys.modules, "openai", fake)
+    monkeypatch.setenv("MODEL_API_KEY", "test-key-not-real")
+    assert meta_api.chat([{"role": "user", "content": "hi"}]) == "hi"
+    assert calls["max_tokens"] == 220
+    assert calls["model"] == "muse-spark-1.3"
+
+
 def _ask(client):
     with open("demo/jacket.png", "rb") as f:
         return client.post(

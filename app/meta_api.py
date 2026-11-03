@@ -24,6 +24,7 @@ import os
 
 BASE_URL = "https://api.meta.ai/v1"
 MODEL = os.environ.get("EPIGEN_MODEL", "muse-spark-1.3")
+MAX_TOKENS = 220  # same cap for Plain and Epigen; server trims to ~130 words
 
 
 def has_key() -> bool:
@@ -38,7 +39,9 @@ def _client():
 
 def chat(messages: list[dict], model: str = MODEL) -> str:
     client = _client()
-    response = client.chat.completions.create(model=model, messages=messages)
+    response = client.chat.completions.create(
+        model=model, messages=messages, max_tokens=MAX_TOKENS
+    )
     return response.choices[0].message.content or ""
 
 

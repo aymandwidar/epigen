@@ -248,6 +248,9 @@ function renderMap(map) {
 fetch("/api/health").then(r => r.json()).then(h => {
   $("mode").textContent = h.demo_mode ? "DEMO MODE (no MODEL_API_KEY)" : "LIVE (Meta Model API)";
 });
+fetch("/api/memories").then(r => r.json()).then(m => {
+  renderMap((m.memories || []).map(x => ({ id: x.id, angle: x.angle, text: x.text, score: null })));
+}).catch(() => {});
 $("photo").addEventListener("change", e => {
   const f = e.target.files[0];
   if (!f) return;

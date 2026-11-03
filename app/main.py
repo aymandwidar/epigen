@@ -12,7 +12,7 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from . import meta_api
-from .embeddings import embed
+from .embeddings import embed, embedding_dim
 from .retrieval import (
     build_epigen_prompt,
     extract_citations,
@@ -35,14 +35,86 @@ def health():
     return {"ok": True, "demo_mode": not meta_api.has_key()}
 
 
+@app.get("/api/memories")
+def list_memories():
+    """All memories for the memory map; scores arrive via /api/ask."""
+    conn = connect()
+    try:
+        memories = load_memories(conn)
+    finally:
+        conn.close()
+    return {
+        "count": len(memories),
+        "memories": [
+            {"id": m["id"], "angle": m["angle"], "text": m["text"]}
+            for m in memories
+        ],
+    }
+
+
+TRIM_WORDS = 130  # same server-side cap for Plain and Epigen answers
+
+
+def trim_to_words(text: str, limit: int = TRIM_WORDS) -> str:
+    """Trim to ~limit words at a sentence boundary."""
+    words = text.split()
+    if len(words) <= limit:
+        return text
+    kept: list[str] = []
+    count = 0
+    for sentence in re.split(r"(?<=[.!?])\s+", text):
+        n = len(sentence.split())
+        if count + n > limit:
+            break
+        kept.append(sentence)
+        count += n
+    if not kept:
+        return " ".join(words[:limit]).rstrip(",;:") + "…"
+    return " ".join(kept)
+
+
+def _error_result(msg: str) -> dict:
+    return {
+        "plain": msg,
+        "epigen": msg,
+        "epigen_json": None,
+        "epigen_text": msg,
+        "photo_description": "",
+        "cited": [],
+        "grouped": {},
+        "map": [],
+        "demo_mode": not meta_api.has_key(),
+    }
+
+
 @app.post("/api/ask")
 async def ask(
     question: str = Form("Should I buy this?"),
     photo: UploadFile | None = File(default=None),
 ):
+    try:
+        return await _run_ask(question, photo)
+    except Exception as exc:
+        # Never leave a column blank; key material is never logged.
+        log.exception("/api/ask failed")
+        return _error_result(
+            f"Something went wrong ({exc}). Please try again."
+        )
+
+
+async def _run_ask(question: str, photo: UploadFile | None):
     conn = connect()
     memories = load_memories(conn)
     conn.close()
+    qdim = embedding_dim()
+    stale = [m["id"] for m in memories if len(m["embedding"]) != qdim]
+    if stale:
+        log.warning(
+            "dropping %d memories with stale embedding dim "
+            "(re-seed after switching EPIGEN_EMBEDDINGS): %s",
+            len(stale), stale[:8],
+        )
+        memories = [m for m in memories if len(m["embedding"]) == qdim]
 
     photo_description = ""
     filename = ""
@@ -76,6 +148,8 @@ async def ask(
     else:
         plain = meta_api.stub_plain(question, photo_description)
         epigen_text = meta_api.stub_epigen(question, retrieved)
+
+    plain = trim_to_words(plain)
 
     epigen_json = parse_epigen_json(epigen_text)
     by_id = {m["id"]: m for m in retrieved}
@@ -114,7 +188,7 @@ async def ask(
             for m in retrieved
         ]
 
-    epigen_text_out = (
+    epigen_text_out = trim_to_words(
         epigen_json.get("answer", epigen_text)
         if epigen_json is not None else epigen_text
     )

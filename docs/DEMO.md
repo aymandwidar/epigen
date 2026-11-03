@@ -1,4 +1,4 @@
-# Epigen demo script — 3 minutes, one screen recording
+# Epigen demo script — 3 minutes + 15-second MCP beat, one screen recording
 
 Reset before every take: `.venv/bin/python scripts/reset_demo.py`
 Start: `.venv/bin/python -m uvicorn app.main:app`, open http://localhost:8000.
@@ -27,9 +27,10 @@ Say: *"Every claim carries chips, not footnotes: the $180 jacket I walked
 away from, the $175 corduroy I returned, the $320 overcoat I regretted —
 a pattern of regretting clothing over $150 — AND a family angle: I'm saving
 for an apartment with my partner, so $180 competes with that goal. Both
-columns are capped at 120 words — same budget, personal wins."*
+columns share the same budget — 220 tokens, trimmed to ~130 words — same
+budget, personal wins."*
 
-4. Scroll to the **Memory map**: 65 dots, 8 lit.
+4. Scroll to the **Memory map**: 65 dots, loaded dim on page start, 8 lit.
 
 Say: *"The map shows all 65 memories. Only 8 lit up — the ones expressed in
 this answer. Hover a dot: id, angle, score, text."*
@@ -54,6 +55,20 @@ in each answer. Today it's shopping and family. Tomorrow it's your doctor
 saying 'is this normal for me?', your code reviewer knowing your past bugs,
 your advisor knowing your real budget. The model stays general. The memory
 gets personal. That's Epigen."*
+
+## 2:40–2:55 — Another tool calls Epigen (15 seconds)
+
+1. Open a terminal and run:
+
+```bash
+printf '%s\n' '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"recall","arguments":{"query":"$180 jacket","k":3}}}' | .venv/bin/python app/mcp_server.py
+```
+
+2. Point at the three returned ids.
+
+Say: *"And it's not just this page. Any AI tool can call Epigen over MCP —
+same store, same retrieval: recall, capture, log outcome. The memory layer
+outlives the demo."*
 
 ## Backup lines (if something misbehaves live)
 
