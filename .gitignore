@@ -7,3 +7,5 @@ __pycache__/
 .pytest_cache/
 *.pyc
 .models/
+.playwright-browsers/
+video/assets/*.webm
