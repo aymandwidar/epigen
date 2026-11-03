@@ -13,3 +13,4 @@ video/assets/*.mov
 video/assets/*.mp4
 video/assets/*.webm
 .npm-cache/
+video/.hyperframes/
