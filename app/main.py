@@ -1,6 +1,8 @@
 """Epigen FastAPI app: one page, two answers, memory citations."""
 
+import json
 import os
+import re
 
 from fastapi import FastAPI, File, Form, UploadFile
 from fastapi.responses import FileResponse, JSONResponse
@@ -72,18 +74,30 @@ async def ask(
         plain = meta_api.stub_plain(question, photo_description)
         epigen_text = meta_api.stub_epigen(question, retrieved)
 
-    cited_ids = extract_citations(epigen_text)
+    epigen_json = parse_epigen_json(epigen_text)
     by_id = {m["id"]: m for m in retrieved}
-    cited = [
-        {
-            "id": cid,
-            "angle": by_id[cid]["angle"],
-            "score": round(by_id[cid]["score"], 4),
-            "text": by_id[cid]["text"],
-        }
-        for cid in cited_ids
-        if cid in by_id
-    ]
+    if epigen_json is not None:
+        cited_ids = [
+            mid
+            for r in epigen_json.get("reasons", [])
+            if isinstance(r, dict)
+            for mid in r.get("memory_ids", [])
+        ]
+    else:
+        cited_ids = extract_citations(epigen_text)
+    seen: set[str] = set()
+    cited = []
+    for cid in cited_ids:
+        if cid in by_id and cid not in seen:
+            seen.add(cid)
+            cited.append(
+                {
+                    "id": cid,
+                    "angle": by_id[cid]["angle"],
+                    "score": round(by_id[cid]["score"], 4),
+                    "text": by_id[cid]["text"],
+                }
+            )
     if not cited:
         cited = [
             {
@@ -95,17 +109,50 @@ async def ask(
             for m in retrieved
         ]
 
+    epigen_text_out = (
+        epigen_json.get("answer", epigen_text)
+        if epigen_json is not None else epigen_text
+    )
+    memory_map = [
+        {
+            "id": m["id"],
+            "angle": m["angle"],
+            "text": m["text"],
+            "score": round(by_id[m["id"]]["score"], 4)
+            if m["id"] in by_id else None,
+        }
+        for m in memories
+    ]
+
     return {
         "plain": plain,
         "epigen": epigen_text,
+        "epigen_json": epigen_json,
+        "epigen_text": epigen_text_out,
         "photo_description": photo_description,
         "cited": cited,
         "grouped": {
             angle: [m["id"] for m in ms]
             for angle, ms in group_by_angle(retrieved).items()
         },
+        "map": memory_map,
         "demo_mode": not meta_api.has_key(),
     }
+
+
+def parse_epigen_json(text: str) -> dict | None:
+    """Parse the Epigen JSON reply; None when it is plain text (fallback)."""
+    t = text.strip()
+    if t.startswith("```"):
+        t = re.sub(r"^```(?:json)?\s*", "", t)
+        t = re.sub(r"\s*```$", "", t)
+    try:
+        obj = json.loads(t)
+    except (json.JSONDecodeError, ValueError):
+        return None
+    if not isinstance(obj, dict) or "answer" not in obj:
+        return None
+    return obj
 
 
 @app.post("/api/outcome")

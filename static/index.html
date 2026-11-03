@@ -6,20 +6,21 @@
 <title>Epigen — a personal memory layer for AI</title>
 <style>
   :root { --bg: #0e1116; --card: #171c24; --ink: #e8ecf1; --dim: #9aa4b2;
-          --accent: #7cc4ff; --good: #8fe3a8; --line: #2a3340; }
+          --accent: #7cc4ff; --good: #8fe3a8; --line: #2a3340;
+          --shop: #7cc4ff; --fam: #8fe3a8; }
   * { box-sizing: border-box; }
   body { margin: 0; background: var(--bg); color: var(--ink);
-         font: 16px/1.5 -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+         font: 16px/1.5 -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; }
   header { padding: 20px 28px 0; max-width: 1280px; margin: 0 auto; }
-  header h1 { margin: 0 0 4px; font-size: 28px; }
-  header h1 span { color: var(--accent); }
+  header h1 { margin: 0 0 4px; font-size: 28px; font-weight: 700; }
+  header h1 span { color: var(--accent); font-weight: 400; }
   header p { margin: 0 0 12px; color: var(--dim); }
   #mode { display: inline-block; font-size: 13px; padding: 2px 10px;
           border: 1px solid var(--line); border-radius: 999px; color: var(--dim); }
   main { max-width: 1280px; margin: 0 auto; padding: 16px 28px 40px; }
   #askbar { display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
             background: var(--card); border: 1px solid var(--line);
-            border-radius: 12px; padding: 14px; }
+            border-radius: 10px; padding: 14px; }
   #askbar input[type=text] { flex: 1; min-width: 220px; padding: 10px 12px;
             border-radius: 8px; border: 1px solid var(--line);
             background: #0c0f14; color: var(--ink); font-size: 16px; }
@@ -30,18 +31,53 @@
   .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
   @media (max-width: 800px) { .cols { grid-template-columns: 1fr; } }
   .card { background: var(--card); border: 1px solid var(--line);
-          border-radius: 12px; padding: 16px 18px; }
+          border-radius: 10px; padding: 16px 18px; }
   .card h2 { margin: 0 0 8px; font-size: 18px; }
   .card h2 .tag { font-size: 12px; color: var(--dim); font-weight: normal; }
-  .answer { white-space: pre-wrap; min-height: 120px; }
+  .answer { min-height: 100px; }
+  .answer p, .answer ul, .answer ol, .answer h4, .answer h5, .answer h6 { margin: 0 0 8px; }
+  .answer ul, .answer ol { padding-left: 22px; }
+  .answer code { background: #0c0f14; padding: 1px 5px; border-radius: 4px; font-size: 14px; }
+  .answer a { color: var(--accent); }
+  .words { font-size: 12px; color: var(--dim); margin-top: 6px; }
+  #decision { border: 1px solid var(--line); border-radius: 8px;
+              padding: 12px 14px; margin-bottom: 12px; background: #10151d; }
+  #decision .verdict { font-size: 22px; font-weight: 700; margin: 0 0 8px; }
+  #decision ol { margin: 0 0 8px; padding-left: 22px; }
+  #decision li { margin-bottom: 4px; }
+  #decision .flip { font-size: 14px; color: var(--dim); margin: 0; }
+  #decision .flip strong { color: var(--ink); }
   #cited { list-style: none; margin: 12px 0 0; padding: 0; }
-  #cited li { border-top: 1px solid var(--line); padding: 8px 0; font-size: 14px; }
-  #cited .meta { color: var(--good); font-family: ui-monospace, monospace; font-size: 13px; }
+  #cited li { border-top: 1px solid var(--line); padding: 8px 4px; font-size: 14px;
+              border-radius: 6px; }
+  #cited li.hot { background: #1d2a3a; }
+  #cited .meta { font-family: ui-monospace, monospace; font-size: 13px; }
+  #cited .meta .shop { color: var(--shop); }
+  #cited .meta .fam { color: var(--fam); }
+  #cited .newbadge { display: inline-block; font-size: 11px; font-weight: 700;
+              background: var(--good); color: #06121f; border-radius: 4px;
+              padding: 0 6px; margin-left: 6px; }
+  .chip { display: inline-block; font-size: 13px; padding: 1px 8px; margin: 0 2px;
+          border-radius: 999px; border: 1px solid var(--line); cursor: pointer;
+          background: #0c0f14; color: var(--ink); vertical-align: baseline; }
+  .chip.shop { border-color: var(--shop); }
+  .chip.fam { border-color: var(--fam); }
+  .chip.hot { background: #1d2a3a; }
   #outcome { margin-top: 16px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
   #outcome button { padding: 8px 16px; border-radius: 8px; cursor: pointer;
             border: 1px solid var(--line); background: #0c0f14; color: var(--ink); }
   #outcome button:hover { border-color: var(--accent); }
   #photoDesc { color: var(--dim); font-size: 14px; margin-top: 12px; }
+  #beforeWrap { margin-top: 16px; }
+  #beforeWrap details { background: var(--card); border: 1px solid var(--line);
+              border-radius: 10px; padding: 10px 16px; }
+  #beforeWrap summary { cursor: pointer; color: var(--dim); }
+  #mapPanel { margin-top: 16px; }
+  #mapPanel svg { width: 100%; height: auto; display: block; }
+  #mapPanel .dot { cursor: pointer; }
+  #mapReadout { min-height: 24px; font-size: 14px; color: var(--dim); margin-top: 8px; }
+  #mapReadout strong { color: var(--ink); }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
 </style>
 </head>
 <body>
@@ -54,17 +90,32 @@
   <div id="askbar">
     <input type="file" id="photo" accept="image/*" aria-label="Upload a photo">
     <img id="preview" alt="photo preview">
-    <input type="text" id="question" value="Should I buy this?" aria-label="Your question">
+    <input type="text" id="question" value="Should I buy this $180 jacket?" aria-label="Your question">
     <button id="ask" onclick="ask()">Ask both</button>
   </div>
   <div id="photoDesc"></div>
+  <div id="beforeWrap" hidden>
+    <details id="beforeDetails">
+      <summary>Before — previous Epigen answer (collapsed)</summary>
+      <div id="beforeBody" style="margin-top:8px"></div>
+    </details>
+  </div>
   <div class="cols">
     <div class="card"><h2>Plain Muse <span class="tag">no personal context</span></h2>
-      <div class="answer" id="plain">—</div></div>
+      <div class="answer" id="plain">—</div>
+      <div class="words" id="plainWords"></div></div>
     <div class="card"><h2>Epigen <span class="tag">memory-grounded</span></h2>
+      <div id="decision" hidden></div>
       <div class="answer" id="epigen">—</div>
+      <div class="words" id="epigenWords"></div>
       <h3 style="font-size:15px;margin:14px 0 0">Cited memories</h3>
       <ul id="cited"><li>—</li></ul></div>
+  </div>
+  <div class="card" id="mapPanel">
+    <h2 style="margin:0 0 8px;font-size:18px">Memory map
+      <span class="tag" style="font-size:12px;color:var(--dim);font-weight:normal">all memories · lit = retrieved top 8</span></h2>
+    <svg id="mapSvg" viewBox="0 0 1160 210" role="img" aria-label="Memory map"></svg>
+    <div id="mapReadout">Ask a question to light up the memories it uses. Hover a dot for details.</div>
   </div>
   <div id="outcome">
     <span>Log outcome:</span>
@@ -74,42 +125,178 @@
     <span id="olog" style="color:var(--dim)"></span>
   </div>
 </main>
+<script src="/static/md.js"></script>
 <script>
 const $ = id => document.getElementById(id);
-fetch('/api/health').then(r => r.json()).then(h => {
-  $('mode').textContent = h.demo_mode ? 'DEMO MODE (no MODEL_API_KEY)' : 'LIVE (Meta Model API)';
+const ANGLE = {
+  shopping: { icon: "\uD83D\uDED2", cls: "shop" },
+  family: { icon: "\uD83C\uDFE0", cls: "fam" }
+};
+let citedById = {};
+let prevEpigenHTML = null;
+let pendingOutcome = null;
+
+function esc(s) {
+  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+function words(s) {
+  s = String(s || "").trim();
+  return s ? s.split(/\s+/).length : 0;
+}
+function shortLabel(text) {
+  const m = String(text).match(/\$([\d,]+)\s*([A-Za-z]+)?/);
+  if (m) return ("$" + m[1] + (m[2] ? " " + m[2] : "")).slice(0, 22);
+  return String(text).split(/\s+/).slice(0, 3).join(" ").slice(0, 22);
+}
+function chipHTML(id) {
+  const c = citedById[id];
+  if (!c) return esc("[" + id + "]");
+  const a = ANGLE[c.angle] || { icon: "\uD83D\uDCCC", cls: "" };
+  return '<button class="chip ' + a.cls + '" data-mem="' + esc(id) + '"' +
+    ' title="' + esc(id + " · " + c.angle) + '">' +
+    esc(a.icon + " " + shortLabel(c.text)) + "</button>";
+}
+function chippify(html) {
+  return String(html).replace(/\[mem_[a-z]+_\d+\]/g, m => chipHTML(m.slice(1, -1)));
+}
+function highlight(id, on) {
+  document.querySelectorAll('[data-mem="' + id + '"]').forEach(el => {
+    el.classList.toggle("hot", on);
+  });
+}
+function bindChips(root) {
+  root.querySelectorAll(".chip").forEach(ch => {
+    const id = ch.getAttribute("data-mem");
+    ch.addEventListener("mouseenter", () => highlight(id, true));
+    ch.addEventListener("mouseleave", () => highlight(id, false));
+    ch.addEventListener("click", () => {
+      highlight(id, true);
+      const card = document.querySelector('#cited [data-mem="' + id + '"]');
+      if (card) card.scrollIntoView({ block: "nearest", behavior: "smooth" });
+      setTimeout(() => highlight(id, false), 1200);
+    });
+  });
+}
+function renderDecision(obj) {
+  const box = $("decision");
+  if (!obj || typeof obj.decision !== "string") { box.hidden = true; box.innerHTML = ""; return; }
+  const reasons = (obj.reasons || []).slice(0, 3).map(r => {
+    const chips = (r.memory_ids || []).map(chipHTML).join(" ");
+    return "<li>" + chippify(window.renderMarkdown(String(r.text || ""))) + "<br>" + chips + "</li>";
+  }).join("");
+  box.innerHTML =
+    '<p class="verdict">' + esc(obj.decision) + "</p>" +
+    (reasons ? "<ol>" + reasons + "</ol>" : "") +
+    (obj.would_change_if ? '<p class="flip"><strong>Would change if:</strong> ' +
+      esc(obj.would_change_if) + "</p>" : "");
+  box.hidden = false;
+  bindChips(box);
+}
+function renderCited(cited, newId) {
+  citedById = {};
+  cited.forEach(c => { citedById[c.id] = c; });
+  $("cited").innerHTML = cited.map(c => {
+    const a = ANGLE[c.angle] || { icon: "", cls: "" };
+    return '<li data-mem="' + esc(c.id) + '"><span class="meta"><span class="' + a.cls + '">' +
+      esc(c.id + " · " + c.angle + " · score " + c.score) + "</span>" +
+      (c.id === newId ? '<span class="newbadge">NEW</span>' : "") +
+      "</span><br>" + esc(c.text) + "</li>";
+  }).join("") || "<li>—</li>";
+}
+function renderMap(map) {
+  const svg = $("mapSvg");
+  const NS = "http://www.w3.org/2000/svg";
+  while (svg.firstChild) svg.removeChild(svg.firstChild);
+  const groups = {};
+  (map || []).forEach(m => { (groups[m.angle] = groups[m.angle] || []).push(m); });
+  const colors = { shopping: "#7cc4ff", family: "#8fe3a8" };
+  let y = 40;
+  Object.keys(groups).sort().forEach(angle => {
+    const items = groups[angle];
+    const label = document.createElementNS(NS, "text");
+    label.setAttribute("x", 8); label.setAttribute("y", y + 5);
+    label.setAttribute("fill", "#9aa4b2"); label.setAttribute("font-size", "15");
+    label.textContent = angle + " (" + items.length + ")";
+    svg.appendChild(label);
+    const step = Math.min(30, 1000 / Math.max(items.length, 1));
+    items.forEach((m, i) => {
+      const lit = m.score !== null && m.score !== undefined;
+      const c = document.createElementNS(NS, "circle");
+      c.setAttribute("cx", 150 + i * step);
+      c.setAttribute("cy", y);
+      c.setAttribute("r", lit ? 9 : 5);
+      c.setAttribute("fill", colors[angle] || "#9aa4b2");
+      c.setAttribute("opacity", lit ? 1 : 0.25);
+      if (lit) c.setAttribute("stroke", "#fff");
+      c.classList.add("dot");
+      const title = document.createElementNS(NS, "title");
+      title.textContent = m.id + " · " + m.angle +
+        (lit ? " · score " + m.score : "") + "\n" + m.text;
+      c.appendChild(title);
+      c.addEventListener("mouseenter", () => {
+        $("mapReadout").innerHTML = "<strong>" + esc(m.id) + "</strong> · " +
+          esc(m.angle) + (lit ? " · score " + esc(String(m.score)) : " · not retrieved") +
+          " — " + esc(m.text);
+      });
+      svg.appendChild(c);
+    });
+    y += 80;
+  });
+  svg.setAttribute("viewBox", "0 0 1160 " + (y + 10));
+}
+fetch("/api/health").then(r => r.json()).then(h => {
+  $("mode").textContent = h.demo_mode ? "DEMO MODE (no MODEL_API_KEY)" : "LIVE (Meta Model API)";
 });
-$('photo').addEventListener('change', e => {
+$("photo").addEventListener("change", e => {
   const f = e.target.files[0];
   if (!f) return;
-  $('preview').src = URL.createObjectURL(f);
-  $('preview').style.display = 'block';
+  $("preview").src = URL.createObjectURL(f);
+  $("preview").style.display = "block";
 });
 async function ask() {
-  const btn = $('ask'); btn.disabled = true;
-  $('plain').textContent = '…'; $('epigen').textContent = '…';
+  const btn = $("ask"); btn.disabled = true;
+  $("plain").textContent = "…"; $("epigen").textContent = "…";
   const fd = new FormData();
-  fd.append('question', $('question').value);
-  const f = $('photo').files[0];
-  if (f) fd.append('photo', f);
+  fd.append("question", $("question").value);
+  const f = $("photo").files[0];
+  if (f) fd.append("photo", f);
   try {
-    const r = await fetch('/api/ask', {method: 'POST', body: fd});
+    const r = await fetch("/api/ask", { method: "POST", body: fd });
     const j = await r.json();
-    $('plain').textContent = j.plain;
-    $('epigen').textContent = j.epigen;
-    $('photoDesc').textContent = j.photo_description ? 'Photo: ' + j.photo_description : '';
-    $('cited').innerHTML = j.cited.map(c =>
-      `<li><span class="meta">${c.id} · ${c.angle} · score ${c.score}</span><br>${c.text}</li>`
-    ).join('') || '<li>—</li>';
-  } catch (e) { $('epigen').textContent = 'Error: ' + e; }
+    $("plain").innerHTML = window.renderMarkdown(j.plain);
+    $("plainWords").textContent = words(j.plain) + " words";
+    renderDecision(j.epigen_json);
+    const answerText = j.epigen_text || j.epigen;
+    $("epigen").innerHTML = chippify(window.renderMarkdown(answerText));
+    $("epigenWords").textContent = words(answerText) + " words";
+    bindChips($("epigen"));
+    const newId = pendingOutcome;
+    renderCited(j.cited, newId);
+    bindChips($("cited"));
+    renderMap(j.map);
+    $("photoDesc").textContent = j.photo_description ? "Photo: " + j.photo_description : "";
+    if (newId && prevEpigenHTML) {
+      $("beforeBody").innerHTML = prevEpigenHTML;
+      bindChips($("beforeBody"));
+      $("beforeWrap").hidden = false;
+    }
+    prevEpigenHTML = ($("decision").hidden ? "" : $("decision").outerHTML) + $("epigen").innerHTML;
+    pendingOutcome = null;
+  } catch (e) { $("epigen").textContent = "Error: " + e; }
   btn.disabled = false;
 }
 async function logOutcome(outcome) {
-  const r = await fetch('/api/outcome', {method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({outcome, item: 'the $180 jacket', price: 180})});
+  const r = await fetch("/api/outcome", { method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ outcome, item: "the $180 jacket", price: 180 }) });
   const j = await r.json();
-  $('olog').textContent = r.ok ? 'Saved ' + j.memory.id + ' — ask again to see the change.' : 'Error: ' + j.error;
+  if (r.ok) {
+    pendingOutcome = j.memory.id;
+    $("olog").textContent = "Saved " + j.memory.id + " — ask again to see the change.";
+  } else {
+    $("olog").textContent = "Error: " + j.error;
+  }
 }
 </script>
 </body>

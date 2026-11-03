@@ -64,6 +64,18 @@ def describe_photo(image_bytes: bytes, mime: str = "image/png") -> str:
     return chat(messages)
 
 
+EPIGEN_JSON_INSTRUCTION = (
+    "Reply with a single JSON object only, no markdown fences, no extra text,"
+    ' with exactly these keys: {"decision": "one short verdict sentence",'
+    ' "reasons": [{"text": "one reason", "memory_ids": ["mem_..."]}],'
+    ' "would_change_if": "one sentence on what would flip the verdict",'
+    ' "answer": "the full answer"}.'
+    ' Keep "answer" to about 120 words or fewer.'
+    ' Every personal claim must cite memory ids from the memories given,'
+    ' inside "reasons" and inside "answer" as [mem_...] tags.'
+)
+
+
 def plain_answer(question: str, photo_description: str = "") -> str:
     """Generic answer with no personal context."""
     user = question if not photo_description else (
@@ -74,7 +86,8 @@ def plain_answer(question: str, photo_description: str = "") -> str:
             "role": "developer",
             "content": "Answer as a generic shopping/finance assistant."
             " You know nothing about this user. Give broadly useful advice"
-            " and note the trade-offs. Do not invent personal facts.",
+            " and note the trade-offs. Do not invent personal facts."
+            " Keep your answer to about 120 words or fewer.",
         },
         {"role": "user", "content": user},
     ]
@@ -83,7 +96,7 @@ def plain_answer(question: str, photo_description: str = "") -> str:
 
 def epigen_answer(messages: list[dict]) -> str:
     """Answer from the memory-grounded prompt built by retrieval."""
-    return chat(messages)
+    return chat(messages + [{"role": "developer", "content": EPIGEN_JSON_INSTRUCTION}])
 
 
 # ---- DEMO MODE stubs (no key): deterministic, clearly labeled ----------
@@ -106,28 +119,42 @@ def stub_plain(question: str, photo_description: str) -> str:
 
 
 def stub_epigen(question: str, mems: list[dict]) -> str:
+    import json as _json
+
     shopping = [m for m in mems if m["angle"] == "shopping"]
     family = [m for m in mems if m["angle"] == "family"]
-    parts = []
+    reasons = []
     if shopping:
-        ids = " ".join(f"[{m['id']}]" for m in shopping[:4])
-        parts.append(
-            "You have regretted clothing purchases over $150 before"
-            f" {ids} — expensive jackets tended to go back unworn."
-        )
+        shop_ids = [m["id"] for m in shopping[:4]]
+        reasons.append({
+            "text": "You have regretted clothing purchases over $150"
+                    " before — expensive jackets tended to go back unworn.",
+            "memory_ids": shop_ids,
+        })
     if family:
-        ids = " ".join(f"[{m['id']}]" for m in family[:4])
-        parts.append(
-            "You are also saving for the apartment with your partner"
-            f" {ids}, so $180 now competes directly with that goal."
-        )
-    if not parts:
-        return (
-            "No memory supports a personal recommendation"
-            " (no memory supports this claim)."
-        )
-    return (
-        "I'd pass on the $180 jacket. " + " ".join(parts)
+        fam_ids = [m["id"] for m in family[:4]]
+        reasons.append({
+            "text": "You are saving for the apartment with your partner,"
+                    " so $180 now competes directly with that goal.",
+            "memory_ids": fam_ids,
+        })
+    if not reasons:
+        reasons = [{"text": "No memory supports a personal recommendation"
+                            " (no memory supports this claim).",
+                    "memory_ids": []}]
+    shop_tags = " ".join(f"[{i}]" for r in reasons for i in r["memory_ids"]
+                         if "shopping" in i)
+    fam_tags = " ".join(f"[{i}]" for r in reasons for i in r["memory_ids"]
+                        if "family" in i)
+    answer = (
+        "I'd pass on the $180 jacket. " + shop_tags + " " + fam_tags
         + " If you still want it, wait 48 hours and check it against"
-        " your $200/month clothing budget first."
+        " your clothing budget first."
     )
+    return _json.dumps({
+        "decision": "Pass on the $180 jacket.",
+        "reasons": reasons,
+        "would_change_if": "It would change if the jacket were under $150"
+                           " or the apartment fund hit its target.",
+        "answer": " ".join(answer.split()),
+    })
