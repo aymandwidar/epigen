@@ -81,7 +81,8 @@ def embedding_dim() -> int:
 def embed(text: str, dim: int = HASHED_DIM) -> list[float]:
     if os.environ.get("EPIGEN_EMBEDDINGS", "semantic").lower() == "semantic":
         try:
-            vec = list(next(iter(_load_semantic().embed([text]))))
+            # fastembed returns numpy float32; cast so json.dumps works
+            vec = [float(v) for v in next(iter(_load_semantic().embed([text])))]
             norm = math.sqrt(sum(v * v for v in vec))
             if norm == 0.0:
                 return vec
