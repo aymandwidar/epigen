@@ -21,10 +21,11 @@ says pass — and look at why."*
 
 3. Scroll to **Cited memories**. Point at a shopping citation, then a family one.
 
-Say: *"It cites my own history: I regretted the $189 denim jacket and returned
-the $175 corduroy — a pattern of regretting clothing over $150 — AND it pulls
-a family angle: I'm saving for an apartment with my partner, so $180 competes
-with that goal. Two life domains, one answer, every claim cited."*
+Say: *"It cites my own history: the $180 jacket I walked away from last month,
+the $175 corduroy I returned, the $320 overcoat I regretted — a pattern of
+regretting clothing over $150 — AND it pulls a family angle: I'm saving for
+an apartment with my partner, so $180 competes with that goal. Two life
+domains, one answer, every claim cited."*
 
 ## 1:10–2:00 — Log outcome, ask again (the memory layer learns)
 
