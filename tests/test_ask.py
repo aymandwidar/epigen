@@ -9,7 +9,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from fastapi.testclient import TestClient
 
 import app.main as main_module
-from app.main import app, parse_epigen_json
+from app.main import app, parse_epigen_json, validate_citations
 from app.store import connect as store_connect
 from scripts.seed import main as seed_main
 
@@ -44,6 +44,32 @@ def test_parse_epigen_json_fenced_and_prose_prefixed():
     assert sparse == {"decision": "", "reasons": [],
                       "would_change_if": "", "answer": "ok"}
     assert parse_epigen_json("no braces at all") is None
+
+
+def test_validate_citations_drops_invented_ids(caplog):
+    import logging
+
+    obj = {
+        "decision": "Pass.",
+        "reasons": [
+            {"text": "Jackets over $150 get returned",
+             "memory_ids": ["mem_shopping_029", "mem_shopping_999"]},
+            {"text": "Made-up reason", "memory_ids": ["mem_family_404"]},
+        ],
+        "would_change_if": "",
+        "answer": "Pass.",
+    }
+    with caplog.at_level(logging.WARNING, logger="app.main"):
+        dropped = validate_citations(obj, {"mem_shopping_029"})
+    assert dropped == ["mem_shopping_999", "mem_family_404"]
+    assert any("mem_shopping_999" in r.message and "mem_family_404" in r.message
+               for r in caplog.records)
+    assert obj["reasons"][0] == {
+        "text": "Jackets over $150 get returned",
+        "memory_ids": ["mem_shopping_029"],
+    }
+    assert obj["reasons"][1]["memory_ids"] == []
+    assert obj["reasons"][1]["text"] == "Made-up reason (no memory cited)"
 
 
 def _ask(client):

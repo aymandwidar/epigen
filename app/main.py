@@ -1,8 +1,11 @@
 """Epigen FastAPI app: one page, two answers, memory citations."""
 
 import json
+import logging
 import os
 import re
+
+log = logging.getLogger(__name__)
 
 from fastapi import FastAPI, File, Form, UploadFile
 from fastapi.responses import FileResponse, JSONResponse
@@ -77,6 +80,8 @@ async def ask(
     epigen_json = parse_epigen_json(epigen_text)
     by_id = {m["id"]: m for m in retrieved}
     if epigen_json is not None:
+        validate_citations(epigen_json, set(by_id))
+    if epigen_json is not None:
         cited_ids = [
             mid
             for r in epigen_json.get("reasons", [])
@@ -138,6 +143,33 @@ async def ask(
         "map": memory_map,
         "demo_mode": not meta_api.has_key(),
     }
+
+
+def validate_citations(epigen_json: dict, valid_ids: set[str]) -> list[str]:
+    """Keep only memory_ids retrieved for this request.
+
+    Drops invented ids from reasons (and therefore chips), logs a warning
+    naming them, and marks reasons left with no valid ids "(no memory cited)".
+    Returns the dropped ids.
+    """
+    dropped: list[str] = []
+    for reason in epigen_json.get("reasons", []):
+        if not isinstance(reason, dict):
+            continue
+        keep: list[str] = []
+        for mid in reason.get("memory_ids", []):
+            if mid in valid_ids:
+                if mid not in keep:
+                    keep.append(mid)
+            elif mid not in dropped:
+                dropped.append(mid)
+        reason["memory_ids"] = keep
+        text = str(reason.get("text") or "")
+        if not keep and "(no memory cited)" not in text:
+            reason["text"] = (text + " (no memory cited)").strip()
+    if dropped:
+        log.warning("Epigen cited unknown memories, dropped: %s", dropped)
+    return dropped
 
 
 def parse_epigen_json(text: str) -> dict | None:
